@@ -1,0 +1,10 @@
+apiVersion: scheduling.volcano.sh/v1beta1
+kind: Queue
+metadata:
+  name: torchx
+spec:
+  weight: 5
+  capability:
+    cpu: 24
+    memory: 48Gi
+    nvidia.com/gpu: 6

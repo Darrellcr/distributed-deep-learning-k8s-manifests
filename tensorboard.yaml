@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tensorboard
+  namespace: dcornelius
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tensorboard
+  template:
+    metadata:
+      labels:
+        app: tensorboard
+    spec:
+      containers:
+      - name: tensorboard
+        image: python:3.10.13
+        ports:
+        - containerPort: 6006
+        resources:
+          requests:
+            cpu: 100m
+            memory: 256Mi
+          limits:
+            cpu: 1
+            memory: 4096Mi
+        # install tensorboard and run it
+        command: ["sh", "-c", "pip install torch_tb_profiler && tensorboard --logdir=/mnt/nas/logs/view --host=0.0.0.0"]
+        volumeMounts:
+        - name: nas-pv
+          mountPath: /mnt/nas/logs
+          subPath: tensorboard
+      volumes:
+      - name: nas-pv
+        persistentVolumeClaim:
+          claimName: nas-pvc
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tensorboard
+  namespace: dcornelius
+spec:
+  selector:
+    app: tensorboard
+  ports:
+  - port: 6006
+    targetPort: 6006
+  type: ClusterIP
+---

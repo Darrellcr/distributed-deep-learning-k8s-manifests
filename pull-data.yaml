@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pull-data
+  namespace: dcornelius
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: python-app
+  template:
+    metadata:
+      labels:
+        app: python-app
+    spec:
+      containers:
+      - name: python-app
+        image: python:3.13.2-alpine3.21
+        resources:
+          requests:
+            cpu: 100m
+            memory: 100Mi
+          limits:
+            cpu: 500m
+            memory: 2048Mi
+        command: ["sleep", "7200"]
+        volumeMounts:
+        - name: nas-pv
+          mountPath: /mnt/nas
+        - name: kaggle-api-token
+          mountPath: /root/.config/kaggle
+      volumes:
+      - name: nas-pv
+        persistentVolumeClaim:
+          claimName: nas-pvc
+      - name: kaggle-api-token
+        secret:
+          secretName: kaggle-api-token

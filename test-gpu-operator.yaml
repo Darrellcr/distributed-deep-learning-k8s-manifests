@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: test-gpu-operator
+  namespace: dcornelius
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: test-gpu-operator
+  template:
+    metadata:
+      labels:
+        app: test-gpu-operator
+    spec:
+      containers:
+      - name: test-gpu-operator
+        image: nvidia/cuda:12.2.2-base-ubuntu22.04
+        resources:
+          requests:
+            cpu: 100m
+            memory: 100Mi
+            nvidia.com/gpu: 2  
+          limits:
+            cpu: 500m
+            memory: 512Mi
+            nvidia.com/gpu: 2
+        command: ["sleep", "3600"]

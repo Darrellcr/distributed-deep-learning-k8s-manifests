@@ -1,0 +1,67 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: prometheus
+  namespace: dcornelius
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: prometheus
+  template:
+    metadata:
+      labels:
+        app: prometheus
+    spec:
+      serviceAccountName: prometheus
+      containers:
+        - name: prometheus
+          image: prom/prometheus:v3.3.0
+          args: 
+            - "--config.file=/etc/prometheus/prometheus.yaml"
+            - "--storage.tsdb.path=/prometheus"
+            - "--storage.tsdb.retention.time=90d"
+          ports:
+            - containerPort: 9090
+              name: http-prometheus
+          resources:
+            requests:
+              cpu: 500m
+              memory: 1Gi
+            limits:
+              cpu: 1
+              memory: 2Gi
+          volumeMounts:
+            - name: prometheus-config
+              mountPath: /etc/prometheus
+              readOnly: true
+            - name: nas-pv
+              mountPath: /prometheus
+              subPath: prometheus
+            # - name: kube-root-ca
+            #   mountPath: /etc/prometheus/certs
+            #   readOnly: true
+      volumes:
+        - name: prometheus-config
+          configMap:
+            name: prometheus-config
+        # - name: kube-root-ca
+        #   configMap:
+        #     name: kube-root-ca.crt
+        - name: nas-pv
+          persistentVolumeClaim:
+            claimName: nas-pvc
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: prometheus
+  namespace: dcornelius
+spec:
+  ports:
+    - port: 9090
+      targetPort: http-prometheus
+      protocol: TCP
+  selector:
+    app: prometheus

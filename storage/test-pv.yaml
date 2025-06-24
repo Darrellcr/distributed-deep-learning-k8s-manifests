@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: test-pv
+  namespace: dcornelius
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: alpine
+  template:
+    metadata:
+      labels:
+        app: alpine
+    spec:
+      nodeSelector:
+        kubernetes.io/hostname: cn3
+      containers:
+      - name: alpine
+        image: alpine
+        resources:
+          requests:
+            cpu: 100m
+            memory: 100Mi
+          limits:
+            cpu: 200m
+            memory: 200Mi
+        command: ["sleep", "3600"]
+        volumeMounts:
+        - name: nas-pv
+          mountPath: /mnt/nas
+      volumes:
+      - name: nas-pv
+        persistentVolumeClaim:
+          claimName: nas-pvc

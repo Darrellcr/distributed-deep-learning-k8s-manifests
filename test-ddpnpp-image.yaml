@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ddpnpp
+  namespace: dcornelius
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ddpnpp
+  template:
+    metadata:
+      labels:
+        app: ddpnpp
+    spec:
+      containers:
+        - name: ddpnpp
+          image: darrellcr/ddpnpp:v1
+          command: ["sleep", "3600"]

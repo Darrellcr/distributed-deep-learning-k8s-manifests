@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: torchx
+  namespace: dcornelius
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: torchx
+  template:
+    metadata:
+      labels:
+        app: torchx
+    spec:
+      nodeSelector:
+        node-role.kubernetes.io/control-plane: ""
+      tolerations:
+        - key: node-role.kubernetes.io/control-plane
+          operator: Exists
+          effect: NoSchedule
+      serviceAccountName: torchx-sa
+      dnsPolicy: ClusterFirst
+      containers:
+        - name: torchx
+          image: python:3.12.9-alpine
+          command: ["sleep", "31536000"]
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 1Gi
+          volumeMounts:
+            - name: nas-pvc
+              mountPath: /mnt/dcornelius
+      volumes:
+        - name: nas-pvc
+          persistentVolumeClaim:
+            claimName: nas-pvc

@@ -1,0 +1,12 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: torchx-rolebinding
+subjects:
+  - kind: ServiceAccount
+    name: torchx-sa
+    namespace: dcornelius
+roleRef:
+  kind: ClusterRole
+  name: torchx-cluster-role
+  apiGroup: rbac.authorization.k8s.io
