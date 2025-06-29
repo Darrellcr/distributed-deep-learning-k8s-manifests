@@ -6,5 +6,5 @@ spec:
   weight: 5
   capability:
     cpu: 24
-    memory: 48Gi
+    memory: 128Gi
     nvidia.com/gpu: 6
